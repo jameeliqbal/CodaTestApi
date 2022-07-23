@@ -15,7 +15,7 @@ namespace CodaTestApi.Helpers
         public DataContext(IConfiguration configuration,DbContextOptions options): base(options)
         {
             this.configuration = configuration;
-            LoadEvents();
+            if (Events.Count()==0) LoadEvents();
         }
 
         //public DataContext(DbContextOptions options) : base(options)

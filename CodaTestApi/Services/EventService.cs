@@ -63,10 +63,10 @@ namespace CodaTestApi.Services
         {
             var existingEvent = getEvent(id);
 
-            if (model.StartOn < DateTime.Now)
+            if (model.StartOn > DateTime.MinValue && model.StartOn < DateTime.Now)
                 throw new AppException("Start Date & Time should not be less than present time");
 
-            if (model.EndOn < model.StartOn)
+            if (model.StartOn > DateTime.MinValue && model.EndOn < model.StartOn)
                 throw new AppException("End Date & Time should not be less than Start Date & Time");
 
             mapper.Map(model, existingEvent);
