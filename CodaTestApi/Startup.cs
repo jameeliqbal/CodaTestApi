@@ -1,3 +1,4 @@
+using CodaTestApi.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CodaTestApi.Services;
 
 namespace CodaTestApi
 {
@@ -26,8 +28,16 @@ namespace CodaTestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<DataContext>();
+            services.AddCors();
+            services.AddControllers().AddJsonOptions(j =>
+            {
+                j.JsonSerializerOptions.IgnoreNullValues = true;
+            });
 
-            services.AddControllers();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddScoped<IEventService, EventService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CodaTestApi", Version = "v1" });
@@ -44,12 +54,15 @@ namespace CodaTestApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CodaTestApi v1"));
             }
 
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
 
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

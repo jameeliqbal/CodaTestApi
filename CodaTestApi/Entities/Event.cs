@@ -7,6 +7,7 @@ namespace CodaTestApi.Entities
 {
     public class Event
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public DateTime StartOn { get; set; }
         public DateTime EndOn { get; set; }

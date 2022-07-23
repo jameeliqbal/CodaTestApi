@@ -14,7 +14,7 @@ namespace CodaTestApi.Helpers
         private readonly RequestDelegate next;
         private readonly ILogger logger;
 
-        public ErrorHandlerMiddleware(RequestDelegate next, ILogger logger)
+        public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)
         {
             this.next = next;
             this.logger = logger;

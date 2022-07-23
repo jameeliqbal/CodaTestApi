@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using CodaTestApi.Models.Events;
+using CodaTestApi.Services;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CodaTestApi.Controllers
 {
@@ -12,36 +13,54 @@ namespace CodaTestApi.Controllers
     [Route("[controller]")]
     public class EventsController : ControllerBase
     {
+        private IEventService eventService;
+        private IMapper mapper;
+
+        public EventsController(IEventService eventService, IMapper mapper)
+        {
+            this.eventService = eventService;
+            this.mapper = mapper;
+        }
+
         // GET: /Events
         [HttpGet]
         public IActionResult GetAll()
         {
-            return new  JsonResult  (new string[] { "value1", "value2" });
+            var events = eventService.GetAll();
+            return Ok(events);
         }
 
         // GET /Events/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            return Content("value");
+            var @event = eventService.GetById(id);
+            return Ok(@event);
+
         }
 
         // POST /Events
         [HttpPost]
-        public IActionResult Create([FromBody] string value)
+        public IActionResult Create(CreateEventRequest model)
         {
+            eventService.Create(model);
+            return Ok(new { message = "Event Created!" });
         }
 
         // PUT /Events/5
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] string value)
+        public IActionResult Update(int id,UpdateEventRequest model)
         {
+            eventService.Update(id,model);
+            return Ok(new { message = "Event Updated!" });
         }
 
         // DELETE /Events/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            eventService.Delete(id);
+            return Ok(new { message = "Event Deleted!" });
         }
     }
 }
