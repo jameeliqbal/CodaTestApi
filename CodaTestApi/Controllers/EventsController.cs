@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CodaTestApi.Entities;
+using CodaTestApi.Helpers;
 using CodaTestApi.Models.Events;
 using CodaTestApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +29,7 @@ namespace CodaTestApi.Controllers
         public IActionResult GetAll()
         {
             var events = eventService.GetAll();
-            return Ok(events);
+            return Ok(new Response<IEnumerable<Event>>( events));
         }
 
         // GET /Events/5
@@ -35,7 +37,7 @@ namespace CodaTestApi.Controllers
         public IActionResult Get(int id)
         {
             var @event = eventService.GetById(id);
-            return Ok(@event);
+            return Ok(new Response<Event>(@event));
 
         }
 
@@ -43,8 +45,9 @@ namespace CodaTestApi.Controllers
         [HttpPost]
         public IActionResult Create(CreateEventRequest model)
         {
-            eventService.Create(model);
-            return Ok(new { message = "Event Created!" });
+           var newEvent=  eventService.Create(model);
+            // return Ok(new { message = "Event Created!" });
+            return Ok(new Response<Event>(newEvent) { Message = "Event Created!" });
         }
 
         // PUT /Events/5
@@ -52,7 +55,8 @@ namespace CodaTestApi.Controllers
         public IActionResult Update(int id,UpdateEventRequest model)
         {
             eventService.Update(id,model);
-            return Ok(new { message = "Event Updated!" });
+            //return Ok(new { message = "Event Updated!" });
+            return Ok(new Response<Event>() { Succeeded=true, Message = "Event Updated!" });
         }
 
         // DELETE /Events/5
@@ -60,7 +64,9 @@ namespace CodaTestApi.Controllers
         public IActionResult Delete(int id)
         {
             eventService.Delete(id);
-            return Ok(new { message = "Event Deleted!" });
+            // return Ok(new { message = "Event Deleted!" });
+            return Ok(new Response<int>() { Succeeded = true, Data =id, Message = "Event Deleted!" });
+
         }
     }
 }

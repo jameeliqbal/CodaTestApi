@@ -13,7 +13,7 @@ namespace CodaTestApi.Services
     {
         IEnumerable<Event> GetAll();
         Event GetById(int id);
-        void Create(CreateEventRequest model);
+        Event Create(CreateEventRequest model);
         void Update(int id, UpdateEventRequest model);
         void Delete(int id);
     }
@@ -39,7 +39,7 @@ namespace CodaTestApi.Services
             return getEvent(id);
         }       
 
-        public void Create(CreateEventRequest model)
+        public Event Create(CreateEventRequest model)
         {
             if (string.IsNullOrEmpty(model.Title))
                 throw new AppException("Title Cannot be empty");
@@ -57,6 +57,7 @@ namespace CodaTestApi.Services
 
             context.Events.Add(newEvent);
             context.SaveChanges();
+            return newEvent;
         }
 
         public void Update(int id, UpdateEventRequest model)

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CodaTestApi.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace CodaTestApi.Helpers
                         break;
                 }
 
-                var result = JsonSerializer.Serialize(new { message = ex?.Message });
+                var result = JsonSerializer.Serialize(new Response<Event>() { Message = ex?.Message });
                 await response.WriteAsync(result);
             }
         }
