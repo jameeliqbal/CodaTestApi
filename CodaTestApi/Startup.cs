@@ -14,6 +14,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using CodaTestApi.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using CodaTestApi.Services.Auth;
 
 namespace CodaTestApi
 {
@@ -45,12 +48,72 @@ namespace CodaTestApi
                 j.JsonSerializerOptions.IgnoreNullValues = true;
             });
 
+            //credentials
+            var users = new Dictionary<string, string>
+            {
+                { "jon","jon123" },
+                { "jane","jane123" }
+            };
+
+            // add to IoC container
+            services.AddSingleton<IUserService>(new UserService(users));
+
+            //jwt
+            var key = System.Text.Encoding.ASCII.GetBytes(TokenConfigs.Secret);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+
+
+
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IEventService, EventService>();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CodaTestApi", Version = "v1" });
+
+                c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "bearerAuth"
+                                }
+                            },
+                            new string[] {}
+                    }
+                });
             });
         }
 
@@ -71,6 +134,7 @@ namespace CodaTestApi
 
             app.UseMiddleware<ErrorHandlerMiddleware>();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             

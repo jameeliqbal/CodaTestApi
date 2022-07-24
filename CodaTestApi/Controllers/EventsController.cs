@@ -3,6 +3,7 @@ using CodaTestApi.Entities;
 using CodaTestApi.Helpers;
 using CodaTestApi.Models.Events;
 using CodaTestApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace CodaTestApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class EventsController : ControllerBase
     {
         private IEventService eventService;
