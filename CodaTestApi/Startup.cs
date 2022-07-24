@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CodaTestApi.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace CodaTestApi
 {
@@ -30,6 +31,15 @@ namespace CodaTestApi
         {
             services.AddDbContext<DataContext>();
             services.AddCors();
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IUriService>(i =>
+            {
+                var accessor = i.GetRequiredService<IHttpContextAccessor>();
+                var request = accessor.HttpContext.Request;
+                var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+                return new URIService(uri);
+            });
+
             services.AddControllers().AddJsonOptions(j =>
             {
                 j.JsonSerializerOptions.IgnoreNullValues = true;
@@ -54,11 +64,12 @@ namespace CodaTestApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CodaTestApi v1"));
             }
 
-            app.UseMiddleware<ErrorHandlerMiddleware>();
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
 
             app.UseAuthorization();
 

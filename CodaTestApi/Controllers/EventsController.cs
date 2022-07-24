@@ -26,44 +26,48 @@ namespace CodaTestApi.Controllers
 
         // GET: /Events
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var events = eventService.GetAll();
-            return Ok(new Response<IEnumerable<Event>>( events));
+            //var events = eventService.GetAll(filter);
+            //return Ok(new Response<IEnumerable<Event>>( events));
+            var route = Request.Path.Value;
+            var eventsPagedData = await eventService.GetAll(filter, route).ConfigureAwait(false);
+            
+            return Ok(eventsPagedData);
         }
 
         // GET /Events/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var @event = eventService.GetById(id);
+            var @event = await eventService.GetById(id);
             return Ok(new Response<Event>(@event));
 
         }
 
         // POST /Events
         [HttpPost]
-        public IActionResult Create(CreateEventRequest model)
+        public async Task<IActionResult> Create(CreateEventRequest model)
         {
-           var newEvent=  eventService.Create(model);
+           var newEvent= await  eventService.Create(model).ConfigureAwait(false);
             // return Ok(new { message = "Event Created!" });
             return Ok(new Response<Event>(newEvent) { Message = "Event Created!" });
         }
 
         // PUT /Events/5
         [HttpPut("{id}")]
-        public IActionResult Update(int id,UpdateEventRequest model)
+        public async Task<IActionResult> Update(int id,UpdateEventRequest model)
         {
-            eventService.Update(id,model);
+           await  eventService.Update(id,model).ConfigureAwait(false);
             //return Ok(new { message = "Event Updated!" });
             return Ok(new Response<Event>() { Succeeded=true, Message = "Event Updated!" });
         }
 
         // DELETE /Events/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            eventService.Delete(id);
+            await eventService.Delete(id).ConfigureAwait(false);
             // return Ok(new { message = "Event Deleted!" });
             return Ok(new Response<int>() { Succeeded = true, Data =id, Message = "Event Deleted!" });
 
