@@ -51,8 +51,8 @@ namespace CodaTestApi
             //credentials
             var users = new Dictionary<string, string>
             {
-                { "jon","jon123" },
-                { "jane","jane123" }
+                { "user1","C0d@gency9876543210" },
+                { "user2","C0d@gency9876543210" }
             };
 
             // add to IoC container
@@ -79,9 +79,6 @@ namespace CodaTestApi
                         ValidateAudience = false
                     };
                 });
-
-
-
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IEventService, EventService>();
